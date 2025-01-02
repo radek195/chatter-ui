@@ -1,17 +1,17 @@
 import './App.css'
 import {Initial} from "./initial/Initial.tsx";
-import {useEffect, useState} from "react";
+import {useState} from "react";
+import {Chat} from "./chat/Chat.tsx";
 
 function App() {
-    const [nickname, setNickname] = useState("");
-
-    useEffect(() => {
-      console.log("Nickname to: " + nickname);
-    })
+    const [nickname, setNickname] = useState<string>("");
 
     return (
         <>
-            <Initial setNickname={setNickname} />
+            {nickname.length < 2 ?
+                <Initial setNickname={setNickname}/> :
+                <Chat myNickname={nickname}/>
+            }
         </>
     )
 }

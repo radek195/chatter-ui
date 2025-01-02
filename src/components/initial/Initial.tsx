@@ -3,7 +3,7 @@ import {useState} from "react";
 
 export const Initial = ({setNickname}) => {
     const [inputValue, setInputValue] = useState('');
-    const [error, setError] = useState(true)
+    const [error, setError] = useState(false)
 
     const handleInputChange = (e) => {
         setInputValue(e.target.value);

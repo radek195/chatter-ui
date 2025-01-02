@@ -1,0 +1,131 @@
+main {
+    width: 46vw;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    height: 80%;
+    overflow-y: auto;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.message {
+    position: relative;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.8rem;
+    align-self: flex-start;
+    margin: 0.15rem 0 0.03rem;
+}
+
+.message+.message {
+    margin: 0.03rem 0;
+}
+
+.message:before {
+    display: block;
+    position: absolute;
+    color: black;
+    transform: translateY(-100%);
+    top: 0;
+    font-size: 0.8rem;
+    content: var(--nickname);
+}
+
+.received:before {
+    left: 0.5rem;
+}
+
+.received+.received:before {
+    display: none;
+}
+
+.self:before {
+    right: 0.5rem;
+}
+.self+.self:before {
+    display: none;
+}
+
+.message.received {
+    background-color: #345acf;
+    color: white;
+    align-self: flex-start;
+}
+
+.message.self {
+    background-color: #f1f1ff;
+    color: black;
+    align-self: flex-end;
+}
+
+.scroll-container::-webkit-scrollbar {
+    width: 1rem;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #244abf;
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #041a7f;
+    cursor: pointer;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    font-size: 1.5rem;
+    margin-top: 3rem;
+}
+
+.controls > button {
+    width: 30%;
+    background-color: #244abf;
+    color: #fff1df;
+}
+
+.controls > .textbox {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    width: 47%;
+}
+
+.controls > .textbox > textarea {
+    display: block;
+    width: 100%;
+    padding: 1rem 3rem 2rem 1rem;
+    font-size: 1.2rem;
+    resize: none;
+    overflow: hidden;
+}
+
+.controls > .textbox > button {
+    position: absolute;
+    padding: 0;
+    height: 2.5rem;
+    aspect-ratio: 1 / 1;
+    background-color: #244abf;
+    border-radius: 50%;
+    right: 5px;
+    bottom: 5px;
+}
+
+.controls > .textbox > button > svg {
+    height: 50%;
+    fill: #fff1df;
+}
+
