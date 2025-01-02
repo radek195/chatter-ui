@@ -18,13 +18,11 @@ main {
 .message {
     position: relative;
     padding: 0.6rem 1.2rem;
+    max-width: 40%;
+    overflow-wrap: break-word;
     border-radius: 0.8rem;
     align-self: flex-start;
-    margin: 0.15rem 0 0.03rem;
-}
-
-.message+.message {
-    margin: 0.03rem 0;
+    margin: 0.15rem 0;
 }
 
 .message:before {
