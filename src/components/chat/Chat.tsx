@@ -1,16 +1,48 @@
 import "./Chat.css"
-import {messages as stubMessages} from "../initial/stubMessages.ts";
-import {CSSProperties, useEffect, useRef, useState} from "react";
+import {ChangeEvent, CSSProperties, FormEvent, useEffect, useRef, useState} from "react";
+import {getChatroom} from "../../api";
+import { Client } from "@stomp/stompjs";
 
 interface Message {
-    nickname: string;
     content: string;
+    senderNickname: string;
 }
 
-export const Chat = ({myNickname}) => {
-    const [messages, setMessages] = useState<Message[]>(stubMessages);
+interface Props {
+    myNickname: string
+}
+
+let stompClient: Client;
+export const Chat = ({myNickname}: Props) => {
+    const [messages, setMessages] = useState<Message[]>([]);
     const [text, setText] = useState<string>("");
-    const scrollableDivRef = useRef(null);
+    const [room, setRoom] = useState<string>("");
+    const scrollableDivRef = useRef<HTMLDivElement | null>(null);
+
+    const connectToNewRoom = async () => {
+        const response = await getChatroom()
+        const newRoom = response.data.uuid;
+        setRoom(newRoom);
+
+        stompClient = new Client({
+            brokerURL: 'ws://localhost:8080/websocket'
+        });
+        stompClient.onConnect = () => {
+            stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
+                const json = JSON.parse(response.body);
+                const message: Message = {
+                    content: json.content,
+                    senderNickname: json.senderNickname
+                }
+                setMessages((prevMessages) => [...prevMessages, message]);
+            })
+        };
+        stompClient.activate();
+    }
+
+    useEffect(() => {
+        connectToNewRoom()
+    }, []);
 
     useEffect(() => {
         const scrollableDiv = scrollableDivRef.current;
@@ -19,39 +51,38 @@ export const Chat = ({myNickname}) => {
         }
     }, [messages]);
 
-    const renderMessages = messages.map(message => {
+    const renderMessages = messages?.map(message => {
         return (
-            myNickname == message.nickname ?
+            myNickname == message.senderNickname ?
                 <p className={"message self"}
-                   style={{"--nickname": `"${message.nickname}"`} as CSSProperties}>{message.content}</p> :
+                   style={{"--nickname": `"${message.senderNickname}"`} as CSSProperties}>{message.content}</p> :
                 <p className={"message received"}
-                   style={{"--nickname": `"${message.nickname}"`} as CSSProperties}>{message.content}</p>
+                   style={{"--nickname": `"${message.senderNickname}"`} as CSSProperties}>{message.content}</p>
         )
     })
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setText(e.target.value);
     }
 
-    const handleSend = (e) => {
-        e.preventDefault()
-        const newMessage: Message = {
-            nickname: myNickname,
-            content: text
-        }
-        setMessages([...messages, newMessage]);
+    const sendMessage = () => {
+        stompClient?.publish({
+            destination: `/app/message/${room}`,
+            body: JSON.stringify(
+                {'content': text, 'senderNickname': myNickname})
+        })
         setText("");
     }
 
-    const handleEnterSend = (event) => {
+    const handleSend = (e: FormEvent) => {
+        e.preventDefault()
+        sendMessage()
+    }
+
+    const handleEnterSend = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault(); // Prevent the default newline behavior in the textarea
-            const newMessage: Message = {
-                nickname: myNickname,
-                content: text
-            }
-            setMessages([...messages, newMessage]);
-            setText("");
+            event.preventDefault();
+            sendMessage()
         }
     };
 

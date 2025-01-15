@@ -1,15 +1,19 @@
 import './Initial.css'
-import {useState} from "react";
+import {Dispatch, FormEvent, SetStateAction, useState} from "react";
 
-export const Initial = ({setNickname}) => {
+interface Props {
+    setNickname: Dispatch<SetStateAction<string>>
+}
+
+export const Initial = ({setNickname}: Props) => {
     const [inputValue, setInputValue] = useState('');
     const [error, setError] = useState(false)
 
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
+    const handleInputChange = (e: FormEvent<HTMLInputElement>) => {
+        setInputValue(e.currentTarget.value);
     };
 
-    const handleButtonClick = () => {
+    const handleButtonClick = async () => {
         if (inputValue.length < 3) {
             setError(true);
             setTimeout(() => {
@@ -26,7 +30,7 @@ export const Initial = ({setNickname}) => {
     }
 
     return (
-        <div className="initial">
+        <form className="initial">
             <input
                 type="text"
                 className={!error ? "input" : "input invalid"}
@@ -42,6 +46,6 @@ export const Initial = ({setNickname}) => {
             >
                 Set nickname
             </button>
-        </div>
+        </form>
     )
 }
