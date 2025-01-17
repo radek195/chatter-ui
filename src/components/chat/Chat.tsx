@@ -66,6 +66,11 @@ export const Chat = ({myNickname}: Props) => {
     }
 
     const sendMessage = () => {
+        const textToSend = text.trim()
+        if (textToSend === "") {
+            setText("");
+            return;
+        }
         stompClient?.publish({
             destination: `/app/message/${room}`,
             body: JSON.stringify(
