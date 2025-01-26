@@ -1,5 +1,6 @@
 import './Initial.css'
 import {Dispatch, FormEvent, SetStateAction, useState} from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     setNickname: Dispatch<SetStateAction<string>>
@@ -8,6 +9,7 @@ interface Props {
 export const Initial = ({setNickname}: Props) => {
     const [inputValue, setInputValue] = useState('');
     const [error, setError] = useState(false)
+    const navigate = useNavigate();
 
     const handleInputChange = (e: FormEvent<HTMLInputElement>) => {
         setInputValue(e.currentTarget.value);
@@ -23,6 +25,7 @@ export const Initial = ({setNickname}: Props) => {
         }
 
         setNickname(inputValue);
+        navigate("/chat")
     };
 
     const onFocus = () => {

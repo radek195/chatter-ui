@@ -3,6 +3,7 @@ import {ChangeEvent, FormEvent, useEffect, useRef, useState} from "react";
 import {getChatroom} from "../../api";
 import { Client } from "@stomp/stompjs";
 import {Message} from "../message/Message.tsx";
+import {StompSubscription} from "@stomp/stompjs/src/stomp-subscription.ts";
 
 interface Message {
     content: string;
@@ -20,33 +21,43 @@ export const Chat = ({myNickname}: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [text, setText] = useState<string>("");
     const [room, setRoom] = useState<string>("");
+    const [subscription, setSubscription] = useState<StompSubscription>(null);
     const scrollableDivRef = useRef<HTMLDivElement | null>(null);
 
-    const connectToNewRoom = async () => {
-        const response = await getChatroom()
-        const newRoom = response.data.uuid;
-        setRoom(newRoom);
-
+    const connect = () => {
         stompClient = new Client({
             brokerURL: 'ws://localhost:8080/websocket'
         });
         stompClient.onConnect = () => {
-            stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
-                console.log(response)
-                const json = JSON.parse(response.body);
-                const message: Message = {
-                    content: json.content,
-                    senderNickname: json.senderNickname,
-                    type: json.type
-                }
-                setMessages((prevMessages) => [...prevMessages, message]);
-            }, {nickname: myNickname})
+            subscribeToNewRoom()
         };
         stompClient.activate();
     }
 
+    const subscribeToNewRoom = async () => {
+        setMessages([]);
+        room.length > 1 && subscription.unsubscribe();
+        const response = await getChatroom()
+        const newRoom = response.data.uuid;
+        setRoom(newRoom);
+        const newSubscription = stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
+            console.log(response)
+            const json = JSON.parse(response.body);
+            const message: Message = {
+                content: json.content,
+                senderNickname: json.senderNickname,
+                type: json.type
+            }
+            setMessages((prevMessages) => [...prevMessages, message]);
+        }, {nickname: myNickname})
+        setSubscription(newSubscription);
+    }
+
     useEffect(() => {
-        connectToNewRoom()
+        connect()
+        return () => {
+            console.log("dismount")
+        }
     }, []);
 
     useEffect(() => {
@@ -90,6 +101,11 @@ export const Chat = ({myNickname}: Props) => {
         }
     };
 
+    const findNext = () => {
+        console.log(room)
+        subscribeToNewRoom()
+    }
+
     return (
         <>
             <main>
@@ -100,7 +116,7 @@ export const Chat = ({myNickname}: Props) => {
                     {renderMessages}
                 </div>
                 <div className={"controls"}>
-                    <button>Go next!</button>
+                    <button onClick={findNext}>Go next!</button>
                     <form className={"textbox"} onSubmit={handleSend}>
                         <textarea onChange={handleInputChange} value={text} onKeyDown={handleEnterSend}/>
                         <button>
