@@ -1,11 +1,14 @@
 import "./Chat.css"
-import {ChangeEvent, CSSProperties, FormEvent, useEffect, useRef, useState} from "react";
+import {ChangeEvent, FormEvent, useEffect, useRef, useState} from "react";
 import {getChatroom} from "../../api";
 import { Client } from "@stomp/stompjs";
+import {Message} from "../message/Message.tsx";
 
 interface Message {
     content: string;
     senderNickname: string;
+    type: string;
+    myNickname: string;
 }
 
 interface Props {
@@ -29,13 +32,15 @@ export const Chat = ({myNickname}: Props) => {
         });
         stompClient.onConnect = () => {
             stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
+                console.log(response)
                 const json = JSON.parse(response.body);
                 const message: Message = {
                     content: json.content,
-                    senderNickname: json.senderNickname
+                    senderNickname: json.senderNickname,
+                    type: json.type
                 }
                 setMessages((prevMessages) => [...prevMessages, message]);
-            })
+            }, {nickname: myNickname})
         };
         stompClient.activate();
     }
@@ -52,13 +57,7 @@ export const Chat = ({myNickname}: Props) => {
     }, [messages]);
 
     const renderMessages = messages?.map(message => {
-        return (
-            myNickname == message.senderNickname ?
-                <p className={"message self"}
-                   style={{"--nickname": `"${message.senderNickname}"`} as CSSProperties}>{message.content}</p> :
-                <p className={"message received"}
-                   style={{"--nickname": `"${message.senderNickname}"`} as CSSProperties}>{message.content}</p>
-        )
+        return <Message nickname={message.senderNickname} content={message.content} type={message.type} myNickname={myNickname}/>;
     })
 
     const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -74,7 +73,7 @@ export const Chat = ({myNickname}: Props) => {
         stompClient?.publish({
             destination: `/app/message/${room}`,
             body: JSON.stringify(
-                {'content': text, 'senderNickname': myNickname})
+                {'content': text, 'senderNickname': myNickname, 'type': 'USER'})
         })
         setText("");
     }
