@@ -1,7 +1,7 @@
 import "./Chat.css"
 import {ChangeEvent, FormEvent, useEffect, useRef, useState} from "react";
 import {getChatroom} from "../../api";
-import { Client } from "@stomp/stompjs";
+import {Client} from "@stomp/stompjs";
 import {Message} from "../message/Message.tsx";
 import {StompSubscription} from "@stomp/stompjs/src/stomp-subscription.ts";
 
@@ -21,7 +21,7 @@ export const Chat = ({myNickname}: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [text, setText] = useState<string>("");
     const [room, setRoom] = useState<string>("");
-    const [subscription, setSubscription] = useState<StompSubscription>(null);
+    const subscriptionRef = useRef<StompSubscription | null>(null);
     const scrollableDivRef = useRef<HTMLDivElement | null>(null);
 
     const connect = () => {
@@ -36,11 +36,13 @@ export const Chat = ({myNickname}: Props) => {
 
     const subscribeToNewRoom = async () => {
         setMessages([]);
-        room.length > 1 && subscription.unsubscribe();
+        if (room.length > 1 && subscriptionRef.current) {
+            subscriptionRef.current.unsubscribe();
+        }
         const response = await getChatroom()
         const newRoom = response.data.uuid;
         setRoom(newRoom);
-        const newSubscription = stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
+        subscriptionRef.current = stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
             console.log(response)
             const json = JSON.parse(response.body);
             const message: Message = {
@@ -49,14 +51,21 @@ export const Chat = ({myNickname}: Props) => {
                 type: json.type
             }
             setMessages((prevMessages) => [...prevMessages, message]);
-        }, {nickname: myNickname})
-        setSubscription(newSubscription);
+        }, {nickname: myNickname});
     }
 
     useEffect(() => {
+        const handleBeforeUnload = () => {
+            subscriptionRef.current?.unsubscribe();
+            if (stompClient.connected) {
+                stompClient.deactivate();
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
         connect()
         return () => {
-            console.log("dismount")
+            window.removeEventListener("beforeunload", handleBeforeUnload);
         }
     }, []);
 
