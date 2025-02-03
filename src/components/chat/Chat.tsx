@@ -36,14 +36,13 @@ export const Chat = ({myNickname}: Props) => {
 
     const subscribeToNewRoom = async () => {
         setMessages([]);
-        if (room.length > 1 && subscriptionRef.current) {
+        if (subscriptionRef.current) {
             subscriptionRef.current.unsubscribe();
         }
         const response = await getChatroom()
         const newRoom = response.data.uuid;
         setRoom(newRoom);
         subscriptionRef.current = stompClient?.subscribe(`/topic/message/room/${newRoom}`, response => {
-            console.log(response)
             const json = JSON.parse(response.body);
             const message: Message = {
                 content: json.content,
@@ -111,7 +110,6 @@ export const Chat = ({myNickname}: Props) => {
     };
 
     const findNext = () => {
-        console.log(room)
         subscribeToNewRoom()
     }
 
