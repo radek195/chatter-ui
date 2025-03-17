@@ -1,5 +1,6 @@
 main {
-    width: 46vw;
+    width: 95vw;
+    max-width: 600px;
     height: 80vh;
     display: flex;
     flex-direction: column;
@@ -111,7 +112,7 @@ main {
     justify-content: space-between;
     align-content: center;
     font-size: 1.5rem;
-    margin-top: 3rem;
+    margin-top: 2rem;
 }
 
 .controls > button {
