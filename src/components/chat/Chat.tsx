@@ -28,7 +28,7 @@ export const Chat = ({myNickname}: Props) => {
 
     const connect = () => {
         stompClient = new Client({
-            brokerURL: `ws://${import.meta.env.VITE_API_BASE_URL}/websocket`
+            brokerURL: `wss://${import.meta.env.VITE_API_BASE_URL}/websocket`
         });
         stompClient.onConnect = () => {
             subscribeToNewRoom()
