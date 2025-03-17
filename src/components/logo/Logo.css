@@ -8,6 +8,7 @@ h1.logo {
     font-style: italic;
     font-family: "Shrikhand", serif;
     cursor: pointer;
+    z-index: 1;
     margin: 0 10px;
 }
 
