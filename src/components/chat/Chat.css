@@ -135,6 +135,7 @@ main {
     font-size: 1.2rem;
     resize: none;
     overflow: hidden;
+    background-color: white;
 }
 
 .controls > .textbox > button {
