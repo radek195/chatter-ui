@@ -3,13 +3,15 @@ import {ChangeEvent, FormEvent, useEffect, useRef, useState} from "react";
 import {getChatroom} from "../../api";
 import {Client} from "@stomp/stompjs";
 import {Message} from "../message/Message.tsx";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
 import {StompSubscription} from "@stomp/stompjs/src/stomp-subscription.ts";
 
 interface Message {
     content: string;
     senderNickname: string;
     type: string;
-    myNickname: string;
+    myNickname?: string;
 }
 
 interface Props {
@@ -26,7 +28,7 @@ export const Chat = ({myNickname}: Props) => {
 
     const connect = () => {
         stompClient = new Client({
-            brokerURL: 'ws://localhost:8080/websocket'
+            brokerURL: `ws://${import.meta.env.VITE_API_BASE_URL}/websocket`
         });
         stompClient.onConnect = () => {
             subscribeToNewRoom()
