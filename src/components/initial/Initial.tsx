@@ -15,12 +15,13 @@ export const Initial = ({setNickname}: Props) => {
         setInputValue(e.currentTarget.value);
     };
 
-    const handleButtonClick = async () => {
+    const handleButtonClick = async (e: FormEvent) => {
+        e.preventDefault();
         if (inputValue.length < 3) {
             setError(true);
             setTimeout(() => {
                 setError(false);
-            }, 2000)
+            }, 3000)
             return;
         }
 
@@ -42,7 +43,7 @@ export const Initial = ({setNickname}: Props) => {
                 onFocus={onFocus}
                 placeholder="Nickname"
             />
-            {error && <p className="error">Nickname too short!</p>}
+            <p className={!error ? "error" : "error visible"}>Nickname too short!</p>
             <button
                 className="button"
                 onClick={handleButtonClick}

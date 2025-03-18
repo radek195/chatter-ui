@@ -13,7 +13,8 @@ main {
     overflow-y: auto;
     border: 2px solid #ccc;
     border-radius: 8px;
-    padding: 2rem;
+    padding: 1.2rem;
+    margin-top: 1rem;
 }
 
 .message {
@@ -24,6 +25,17 @@ main {
     border-radius: 0.8rem;
     align-self: flex-start;
     margin: 0.15rem 0;
+}
+
+@media only screen and (max-height: 450px) {
+    .messages {
+        padding: 0.5rem;
+    }
+
+    .message {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+    }
 }
 
 .message:before {

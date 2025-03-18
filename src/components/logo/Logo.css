@@ -1,15 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Shrikhand&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 h1.logo {
     position: relative;
-    letter-spacing: 2px;
     text-align: center;
+    letter-spacing: 2px;
+    font-size: 2.5rem;
     color: #345acf;
     font-style: italic;
-    font-family: "Shrikhand", serif;
+    font-family: "Press Start 2P", system-ui;
     cursor: pointer;
     z-index: 1;
-    margin: 0 10px;
+    margin: 0;
 }
 
 h1.logo::before {
