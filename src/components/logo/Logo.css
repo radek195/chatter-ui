@@ -10,9 +10,13 @@ h1.logo {
     font-family: "Press Start 2P", system-ui;
     cursor: pointer;
     z-index: 1;
-    margin: 0;
 }
-
+@media (max-width: 400px) {
+    h1.logo {
+        font-size: 2rem;
+        letter-spacing: 1px;
+    }
+}
 h1.logo::before {
     position: absolute;
     content: 'CHATTER';

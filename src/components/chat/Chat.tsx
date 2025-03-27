@@ -1,11 +1,12 @@
 import "./Chat.css"
-import {ChangeEvent, FormEvent, useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, FormEvent, useEffect, useRef, useState} from "react";
 import {getChatroom} from "../../api";
 import {Client} from "@stomp/stompjs";
 import {Message} from "../message/Message.tsx";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import {StompSubscription} from "@stomp/stompjs/src/stomp-subscription.ts";
+import {Preferences} from "../preferences/Preferences.tsx";
 
 interface Message {
     content: string;
@@ -15,11 +16,11 @@ interface Message {
 }
 
 interface Props {
-    myNickname: string
+    userId: number | undefined
 }
 
 let stompClient: Client;
-export const Chat = ({myNickname}: Props) => {
+export const Chat = ({userId}: Props) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [text, setText] = useState<string>("");
     const [room, setRoom] = useState<string>("");
@@ -30,9 +31,6 @@ export const Chat = ({myNickname}: Props) => {
         stompClient = new Client({
             brokerURL: `${import.meta.env.VITE_WSS_BASE_URL}/websocket`
         });
-        stompClient.onConnect = () => {
-            subscribeToNewRoom()
-        };
         stompClient.activate();
     }
 
@@ -52,14 +50,14 @@ export const Chat = ({myNickname}: Props) => {
                 type: json.type
             }
             setMessages((prevMessages) => [...prevMessages, message]);
-        }, {nickname: myNickname});
+        }, {nickname: "lkl"});
     }
 
     useEffect(() => {
-        const handleBeforeUnload = () => {
+        const handleBeforeUnload = async () => {
             subscriptionRef.current?.unsubscribe();
             if (stompClient.connected) {
-                stompClient.deactivate();
+                await stompClient.deactivate();
             }
         };
 
@@ -118,6 +116,7 @@ export const Chat = ({myNickname}: Props) => {
     return (
         <>
             <main>
+                <Preferences userId={userId}></Preferences>
                 <div
                     className={"messages scroll-container"}
                     ref={scrollableDivRef}

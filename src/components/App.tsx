@@ -6,20 +6,22 @@ import {Logo} from "./logo/Logo.tsx";
 import {Route, Routes, useNavigate , useLocation} from "react-router-dom";
 
 function App() {
-    const [nickname, setNickname] = useState<string>("");
     const location = useLocation();
     const navigate = useNavigate();
+    const [userId, setUserId] = useState<number>();
+
     useEffect(() => {
         if (location.pathname == "/chat") {
             navigate("/");
         }
     }, []);
+
     return (
         <>
             <Logo></Logo>
             <Routes>
-                <Route path="/" element={<Initial setNickname={setNickname}/>}/>
-                <Route path="/chat" element={<Chat myNickname={nickname}/>}/>
+                <Route path="/" element={<Initial setUserId={setUserId} />}/>
+                <Route path="/chat" element={<Chat userId={userId}/>}/>
             </Routes>
         </>
     )
